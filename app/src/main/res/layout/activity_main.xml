@@ -6,21 +6,30 @@
     android:layout_height="match_parent"
     tools:context="ru.school21.yks.barcodereader.MainActivity">
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="match_parent"
+    <Switch
+        android:id="@+id/flashSwitch"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="@string/blank_line"
-        tools:ignore="MissingConstraints" />
+        android:layout_marginTop="16dp"
+        android:checked="false"
+        android:minHeight="48dp"
+        android:text="@string/flash"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="MissingConstraints,UseSwitchCompatOrMaterialXml,TextContrastCheck" />
 
     <SurfaceView
         android:id="@+id/surface_view"
         android:layout_width="300dp"
         android:layout_height="300dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="10dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/flashSwitch" />
 
     <TextView
         android:id="@+id/textInvNum"
@@ -134,19 +143,5 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/glpi_text" />
-
-    <ImageView
-        android:id="@+id/imageViewLogo"
-        android:layout_width="100dp"
-        android:layout_height="102dp"
-        android:layout_marginStart="102dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginEnd="121dp"
-        android:contentDescription="@string/logo_school21"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.602"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonInv"
-        app:srcCompat="@drawable/_1school" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

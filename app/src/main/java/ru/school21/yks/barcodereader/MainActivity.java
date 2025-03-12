@@ -1,20 +1,13 @@
 package ru.school21.yks.barcodereader;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import java.lang.reflect.Field;
 import android.hardware.Camera;
-import android.hardware.camera2.CameraAccessException;
-import android.hardware.camera2.CameraManager;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -23,19 +16,27 @@ import android.os.Vibrator;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
+
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -57,7 +58,10 @@ public class MainActivity extends AppCompatActivity {
     private TextView glpiText;
     private TextView dateInventText;
     private String barcodeData;
+    @SuppressLint("UseSwitchCompatOrMaterialCode")
+    private Switch switchFlash;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}
@@ -67,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
         surfaceView = findViewById(R.id.surface_view);
         barcodeText = findViewById(R.id.barcode_text);
+        switchFlash = findViewById(R.id.flashSwitch);
         nameText = findViewById(R.id.name_text);
         serialText = findViewById(R.id.serial_text);
         compText = findViewById(R.id.comp_text);
@@ -250,7 +255,6 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
     private void initialiseDetectorsAndSources() {
-
         barcodeDetector = new BarcodeDetector.Builder(this)
                 .setBarcodeFormats(Barcode.ALL_FORMATS)
                 .build();
@@ -258,46 +262,40 @@ public class MainActivity extends AppCompatActivity {
                 .setRequestedPreviewSize(1080, 1080)
                 .setAutoFocusEnabled(true)
                 .build();
-        /*CameraManager camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-        String cameraId = null;
-        try {
-            cameraId = camManager.getCameraIdList()[0];
-            camManager.setTorchMode(cameraId, true);   //Turn ON
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
-        }*/
         surfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
-                try {
-                    if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                        cameraSource.start(surfaceView.getHolder());
-                        Camera _cam = getCamera (cameraSource);
-                        if (_cam != null) {
-                            Camera.Parameters _pareMeters = _cam.getParameters();
-                            _pareMeters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                            _cam.setParameters(_pareMeters);
-                            _cam.startPreview();
+                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                                cameraSource.start(surfaceView.getHolder());
+                                Camera _cam = getCamera(cameraSource);
+                                if (_cam != null && switchFlash.isChecked()) {
+                                    Camera.Parameters _pareMeters = _cam.getParameters();
+                                    _pareMeters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                                    _cam.setParameters(_pareMeters);
+                                    _cam.startPreview();
+                                } else if (_cam != null && !switchFlash.isChecked()) {
+                                    Camera.Parameters _pareMeters = _cam.getParameters();
+                                    _pareMeters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                                    _cam.setParameters(_pareMeters);
+                                    _cam.startPreview();
+                                }
+                            } else {
+                                ActivityCompat.requestPermissions(MainActivity.this, new
+                                        String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-                    } else {
-                        ActivityCompat.requestPermissions(MainActivity.this, new
-                                String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                }, 500);
             }
 
             @Override
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-                /*CameraManager camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-                String cameraId = null;
-                try {
-                    cameraId = camManager.getCameraIdList()[0];
-                    camManager.setTorchMode(cameraId, true);   //Turn ON
-                } catch (CameraAccessException e) {
-                    e.printStackTrace();
-                }*/
             }
 
             @Override
@@ -305,21 +303,22 @@ public class MainActivity extends AppCompatActivity {
                 cameraSource.stop();
             }
         });
-
         barcodeDetector.setProcessor(new Detector.Processor<Barcode>() {
             @Override
             public void receiveDetections(Detector.Detections<Barcode> detections) {
                 final SparseArray<Barcode> barcodes = detections.getDetectedItems();
-
-                /*CameraManager camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-                String cameraId = null;
-                try {
-                    cameraId = camManager.getCameraIdList()[0];
-                    camManager.setTorchMode(cameraId, true);   //Turn ON
-                } catch (CameraAccessException e) {
-                    e.printStackTrace();
-                }*/
-
+                Camera _cam = getCamera(cameraSource);
+                if (_cam != null && switchFlash.isChecked()) {
+                    Camera.Parameters _pareMeters = _cam.getParameters();
+                    _pareMeters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                    _cam.setParameters(_pareMeters);
+                    _cam.startPreview();
+                } else if (_cam != null && !switchFlash.isChecked()) {
+                    Camera.Parameters _pareMeters = _cam.getParameters();
+                    _pareMeters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                    _cam.setParameters(_pareMeters);
+                    _cam.startPreview();
+                }
                 if (barcodes.size() != 0) {
                     barcodeText.post(new Runnable() {
                         @Override
@@ -352,12 +351,10 @@ public class MainActivity extends AppCompatActivity {
                     });
                 }
             }
-
             @Override
             public void release() {
                 Toast.makeText(getApplicationContext(), "Сканер QR-кодов остановлен для предотвращения утечек памяти", Toast.LENGTH_SHORT).show();
             }
-
         });
     }
 
