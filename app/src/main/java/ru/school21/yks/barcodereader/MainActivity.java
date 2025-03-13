@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView barcodeText;
     private TextView nameText;
     private TextView serialText;
+    private TextView usernameText;
     private TextView compText;
     private TextView glpiText;
     private TextView dateInventText;
@@ -74,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
         switchFlash = findViewById(R.id.flashSwitch);
         nameText = findViewById(R.id.name_text);
         serialText = findViewById(R.id.serial_text);
+        usernameText = findViewById(R.id.username_text);
         compText = findViewById(R.id.comp_text);
         glpiText = findViewById(R.id.glpi_text);
         dateInventText = findViewById(R.id.date_invent_text);
@@ -82,9 +84,9 @@ public class MainActivity extends AppCompatActivity {
         btn_inv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (checkInBase()) {
+                if (checkInBase() && "2024-01-01".contentEquals(dateInventText.getText())) {
                     AlertDialog.Builder a_builder = new AlertDialog.Builder(MainActivity.this);
-                    a_builder.setMessage("Инвентаризировано: " + dateInventText.getText() + "\nПроинвентаризировать снова?")
+                    a_builder.setMessage("Проинвентаризировать?")
                             .setCancelable(false)
                             .setPositiveButton("Да", new DialogInterface.OnClickListener() {
                                 @Override
@@ -202,6 +204,12 @@ public class MainActivity extends AppCompatActivity {
                         } else {
                             dateInventText.setText(dateInv);
                         }
+                        String usernameT = rs.getString("User");
+                        if (TextUtils.isEmpty(usernameT)) {
+                            usernameText.setText("");
+                        } else {
+                            usernameText.setText(usernameT);
+                        }
                         String serNum = rs.getString("Num_serial");
                         if (TextUtils.isEmpty(serNum)) {
                             serialText.setText("");
@@ -222,6 +230,7 @@ public class MainActivity extends AppCompatActivity {
                     nameText.setText("");
                     dateInventText.setText("");
                     serialText.setText("");
+                    usernameText.setText("");
                     compText.setText("");
                     glpiText.setText("");
                 }
@@ -338,6 +347,7 @@ public class MainActivity extends AppCompatActivity {
                             nameText.setText("");
                             dateInventText.setText("");
                             serialText.setText("");
+                            usernameText.setText("");
                             compText.setText("");
                             glpiText.setText("");
                             toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP, 150);
@@ -353,7 +363,7 @@ public class MainActivity extends AppCompatActivity {
             }
             @Override
             public void release() {
-                Toast.makeText(getApplicationContext(), "Сканер QR-кодов остановлен для предотвращения утечек памяти", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), "Сканер QR-кодов остановлен для предотвращения утечек памяти", Toast.LENGTH_SHORT).show();
             }
         });
     }

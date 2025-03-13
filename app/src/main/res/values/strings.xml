@@ -6,4 +6,5 @@
     <string name="button_text">Проинвентаризировать?</string>
     <string name="logo_school21">Logo School21</string>
     <string name="flash">Фонарик</string>
+    <string name="usernametext">Кто проинвентаризировал:</string>
 </resources>

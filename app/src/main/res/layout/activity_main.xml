@@ -10,14 +10,13 @@
         android:id="@+id/flashSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:checked="false"
         android:minHeight="48dp"
         android:text="@string/flash"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="MissingConstraints,UseSwitchCompatOrMaterialXml,TextContrastCheck" />
+        tools:ignore="MissingConstraints,UseSwitchCompatOrMaterialXml,TextContrastCheck"
+        tools:layout_editor_absoluteY="16dp" />
 
     <SurfaceView
         android:id="@+id/surface_view"
@@ -92,6 +91,28 @@
         tools:layout_editor_absoluteX="0dp" />
 
     <TextView
+        android:id="@+id/textUserName"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginTop="5dp"
+        android:gravity="start"
+        android:padding="5dp"
+        android:text="@string/usernametext"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/date_invent_text" />
+
+    <TextView
+        android:id="@+id/username_text"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_marginTop="5dp"
+        android:gravity="end"
+        android:padding="5dp"
+        android:text=""
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@+id/date_invent_text"
+        tools:layout_editor_absoluteX="0dp" />
+    <TextView
         android:id="@+id/serial_text"
         android:layout_width="match_parent"
         android:layout_height="30dp"
@@ -100,7 +121,7 @@
         android:padding="5dp"
         android:text=""
         android:textSize="14sp"
-        app:layout_constraintTop_toBottomOf="@+id/date_invent_text"
+        app:layout_constraintTop_toBottomOf="@+id/username_text"
         tools:layout_editor_absoluteX="0dp" />
 
     <TextView
@@ -143,5 +164,7 @@
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/glpi_text" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
